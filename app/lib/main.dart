@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app/models/item.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +19,9 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Grocery List',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 255, 255, 255),
+        ),
       ),
       home: const MyHomePage(title: 'Grocery List'),
     );
@@ -60,9 +63,12 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      body: Column(children: [
-        
-      ],),
+      // body: ListView.builder(
+      //   itemCount: items.length,
+      //   itemBuilder: (context, index) {
+      //     return null;
+      //   },
+      // ),
     );
   }
 }
