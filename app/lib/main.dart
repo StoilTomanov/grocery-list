@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:app/models/grocery-tems.dart';
+import 'package:get_storage/get_storage.dart';
 
-void main() {
+void main() async {
+  await GetStorage.init();
   runApp(const MyApp());
 }
 
@@ -37,12 +39,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  static final storage = GetStorage();
   List<GroceryItem> groceryList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    final rawList = storage.read('groceryList');
+    if (rawList != null) {
+      groceryList =
+          List<Map>.from(rawList)
+              .map(
+                (item) => GroceryItem.fromJson(Map<String, dynamic>.from(item)),
+              )
+              .toList();
+    }
+  }
 
   void _addItemToList(GroceryItem item) {
     setState(() {
       groceryList.add(item);
+      _saveList();
     });
+  }
+
+  void _saveList() {
+    final jsonList = groceryList.map((item) => item.toJson()).toList();
+    storage.write('groceryList', jsonList);
   }
 
   void _markAsDone(int index, String name, bool? value) {
@@ -52,6 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
       Future.delayed(Duration(seconds: 2), () {
         setState(() {
           groceryList.removeWhere((item) => item.name == name);
+          _saveList();
         });
       });
     });
