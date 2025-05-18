@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:app/models/item.dart';
+import 'package:app/models/grocery-tems.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,8 +37,39 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // logic goes here
+  List<GroceryItem> groceryList = [];
+
+  void _addItemToList(GroceryItem item) {
+    setState(() {
+      groceryList.add(item);
+    });
+  }
+
+  void _markAsDone(int index, String name, bool? value) {
+    setState(() {
+      groceryList[index].isDone = value ?? false;
+
+      Future.delayed(Duration(seconds: 2), () {
+        setState(() {
+          groceryList.removeWhere((item) => item.name == name);
+        });
+      });
+    });
+  }
+
+  String _getIconPath(String name) {
+    switch (name) {
+      case 'apple':
+        return 'assets/icons/apples.png';
+      default:
+        return 'assets/icons/vegetables.png';
+    }
+  }
+
   void _onAddItemPressed() {
+    final nameController = TextEditingController();
+    final qtyController = TextEditingController();
+
     showDialog(
       context: context,
       barrierDismissible: true, // Tap outside to close
@@ -73,6 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     TextField(
+                      controller: nameController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         fillColor: const Color.fromARGB(255, 241, 241, 241),
@@ -97,6 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     TextField(
+                      controller: qtyController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         fillColor: const Color.fromARGB(255, 241, 241, 241),
@@ -112,7 +145,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 const SizedBox(height: 50),
                 ElevatedButton.icon(
                   onPressed: () {
-                    // handle save
+                    final name = nameController.text.trim();
+                    final qty = qtyController.text.trim();
+
+                    _addItemToList(
+                      GroceryItem(
+                        name: name,
+                        qty: qty,
+                        iconPath: _getIconPath(name),
+                        isDone: false,
+                      ),
+                    );
                     Navigator.of(context).pop();
                   },
                   icon: Icon(Icons.check),
@@ -197,8 +240,95 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
+            Expanded(
+              child:
+                  groceryList.isEmpty
+                      ? Center(child: Text("No items yet!"))
+                      : ListView.builder(
+                        itemCount: groceryList.length,
+                        itemBuilder: (context, index) {
+                          final item = groceryList[index];
+                          return GroceryItemTile(
+                            name: item.name,
+                            quantity: item.qty,
+                            iconPath: item.iconPath,
+                            isChecked: item.isDone,
+                            onChanged:
+                                (value) => _markAsDone(index, item.name, value),
+                          );
+                        },
+                      ),
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// todo: export below into a file
+class GroceryItemTile extends StatelessWidget {
+  final String name;
+  final String quantity;
+  final String iconPath;
+  final bool isChecked;
+  final Function(bool?) onChanged;
+
+  const GroceryItemTile({
+    super.key,
+    required this.name,
+    required this.quantity,
+    required this.iconPath,
+    required this.isChecked,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Image.asset(iconPath, height: 40),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '($quantity)',
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          ),
+          Checkbox(
+            value: isChecked,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+            onChanged: onChanged,
+          ),
+        ],
       ),
     );
   }
