@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:app/models/grocery-tems.dart';
+import 'package:app/models/grocery_items.dart';
 import 'package:get_storage/get_storage.dart';
 
 void main() async {
@@ -82,9 +82,35 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String _getIconPath(String name) {
-    switch (name) {
+    switch (name.toLowerCase()) {
       case 'apple':
         return 'assets/icons/apples.png';
+      case 'milk':
+        return 'assets/icons/milk.png';
+      case 'olives':
+        return 'assets/icons/olives.png';
+      case 'bread':
+        return 'assets/icons/bread.png';
+      case 'cheese':
+        return 'assets/icons/cheese.png';
+      case 'cucumbers':
+        return 'assets/icons/cucumbers.png';
+      case 'eggs':
+        return 'assets/icons/eggs.png';
+      case 'meat':
+        return 'assets/icons/meat.png';
+      case 'medicine':
+        return 'assets/icons/medicine.png';
+      case 'nuts':
+        return 'assets/icons/nuts.png';
+      case 'snack':
+        return 'assets/icons/snack.png';
+      case 'tomatoes':
+        return 'assets/icons/tomatoes.png';
+      case 'water':
+        return 'assets/icons/water.png';
+      case 'yogurt':
+        return 'assets/icons/yogurt.png';
       default:
         return 'assets/icons/vegetables.png';
     }
@@ -265,23 +291,32 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             Expanded(
-              child:
-                  groceryList.isEmpty
-                      ? Center(child: Text("No items yet!"))
-                      : ListView.builder(
-                        itemCount: groceryList.length,
-                        itemBuilder: (context, index) {
-                          final item = groceryList[index];
-                          return GroceryItemTile(
-                            name: item.name,
-                            quantity: item.qty,
-                            iconPath: item.iconPath,
-                            isChecked: item.isDone,
-                            onChanged:
-                                (value) => _markAsDone(index, item.name, value),
-                          );
-                        },
-                      ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child:
+                    groceryList.isEmpty
+                        ? Center(child: Text("No items yet!"))
+                        : ListView.builder(
+                          itemCount: groceryList.length,
+                          itemBuilder: (context, index) {
+                            final item = groceryList[index];
+                            return Column(
+                              children: [
+                                GroceryItemTile(
+                                  name: item.name,
+                                  quantity: item.qty,
+                                  iconPath: item.iconPath,
+                                  isChecked: item.isDone,
+                                  onChanged:
+                                      (value) =>
+                                          _markAsDone(index, item.name, value),
+                                ),
+                                SizedBox(height: 10),
+                              ],
+                            );
+                          },
+                        ),
+              ),
             ),
           ],
         ),
