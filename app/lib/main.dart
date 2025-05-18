@@ -38,6 +38,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   // logic goes here
+  void _onAddItemPressed() {
+    print('Add item is clicked!');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 Text(
                   widget.title,
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(width: 8),
                 Image.asset('assets/icons/cart.png', height: 35, width: 35),
@@ -63,12 +66,49 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      // body: ListView.builder(
-      //   itemCount: items.length,
-      //   itemBuilder: (context, index) {
-      //     return null;
-      //   },
-      // ),
+      body: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: _onAddItemPressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 217, 244, 236),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 15,
+                  horizontal: 5,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.add,
+                      color: const Color.fromARGB(255, 2, 175, 123),
+                      size: 28,
+                      weight: 23,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'Add Item',
+                      style: TextStyle(
+                        color: const Color.fromARGB(255, 70, 103, 93),
+                        fontSize: 23,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
