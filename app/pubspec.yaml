@@ -31,6 +31,9 @@ dependencies:
   flutter:
     sdk: flutter
   get_storage: ^2.1.1
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.19.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -61,6 +64,19 @@ flutter:
   assets:
     - assets/icons/cart.png
     - assets/icons/apples.png
+    - assets/icons/milk.png
+    - assets/icons/olives.png
+    - assets/icons/bread.png
+    - assets/icons/cheese.png
+    - assets/icons/cucumbers.png
+    - assets/icons/eggs.png
+    - assets/icons/meat.png
+    - assets/icons/medicine.png
+    - assets/icons/nuts.png
+    - assets/icons/snack.png
+    - assets/icons/tomatoes.png
+    - assets/icons/water.png
+    - assets/icons/yogurt.png
     - assets/icons/vegetables.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
