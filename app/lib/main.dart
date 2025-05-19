@@ -41,8 +41,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static final storage = GetStorage();
   List<GroceryItem> groceryList = [];
-  final Set<int> _fadingItems = {};
-  final Set<int> _markedDone = {};
+  final Set<String> _markedDone = {};
+  final Set<String> _fadingItems = {};
 
   @override
   void initState() {
@@ -73,21 +73,19 @@ class _MyHomePageState extends State<MyHomePage> {
   void _markAsDone(int index, String name, bool? value) {
     setState(() {
       groceryList[index].isDone = value ?? false;
-      _markedDone.add(index); // immediately mark as done (for checkbox UI)
+      _markedDone.add(name);
     });
 
-    // After 2 seconds, start fading out
     Future.delayed(Duration(seconds: 2), () {
       setState(() {
-        _fadingItems.add(index);
+        _fadingItems.add(name);
       });
 
-      // After animation (400ms), remove the item
       Future.delayed(Duration(milliseconds: 400), () {
         setState(() {
-          groceryList.removeAt(index);
-          _fadingItems.remove(index);
-          _markedDone.remove(index);
+          groceryList.removeWhere((item) => item.name == name);
+          _fadingItems.remove(name);
+          _markedDone.remove(name);
           _saveList();
         });
       });
@@ -327,9 +325,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         : ListView.builder(
                           itemCount: groceryList.length,
                           itemBuilder: (context, index) {
-                            final isFading = _fadingItems.contains(index);
-                            final isDone = groceryList[index].isDone;
                             final item = groceryList[index];
+                            final isFading = _fadingItems.contains(item.name);
+                            final isDone = item.isDone;
 
                             return AnimatedSlide(
                               offset:
