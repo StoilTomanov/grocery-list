@@ -201,7 +201,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     _addItemToList(
                       GroceryItem(
                         name: name,
-                        qty: qty,
+                        qty: qty == '' ? '1' : qty,
                         iconPath: _getIconPath(name),
                         isDone: false,
                       ),
