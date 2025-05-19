@@ -25,7 +25,7 @@ class _MyAppState extends State<MyApp> {
           seedColor: const Color.fromARGB(255, 255, 255, 255),
         ),
       ),
-      home: const MyHomePage(title: 'Grocery List'),
+      home: const MyHomePage(title: 'Списък за пазаруване'),
     );
   }
 }
@@ -41,6 +41,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static final storage = GetStorage();
   List<GroceryItem> groceryList = [];
+  final Set<int> _fadingItems = {};
+  final Set<int> _markedDone = {};
 
   @override
   void initState() {
@@ -71,10 +73,21 @@ class _MyHomePageState extends State<MyHomePage> {
   void _markAsDone(int index, String name, bool? value) {
     setState(() {
       groceryList[index].isDone = value ?? false;
+      _markedDone.add(index); // immediately mark as done (for checkbox UI)
+    });
 
-      Future.delayed(Duration(seconds: 2), () {
+    // After 2 seconds, start fading out
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        _fadingItems.add(index);
+      });
+
+      // After animation (400ms), remove the item
+      Future.delayed(Duration(milliseconds: 400), () {
         setState(() {
-          groceryList.removeWhere((item) => item.name == name);
+          groceryList.removeAt(index);
+          _fadingItems.remove(index);
+          _markedDone.remove(index);
           _saveList();
         });
       });
@@ -82,38 +95,53 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String _getIconPath(String name) {
-    switch (name.toLowerCase()) {
-      case 'apple':
-        return 'assets/icons/apples.png';
-      case 'milk':
-        return 'assets/icons/milk.png';
-      case 'olives':
-        return 'assets/icons/olives.png';
-      case 'bread':
-        return 'assets/icons/bread.png';
-      case 'cheese':
-        return 'assets/icons/cheese.png';
-      case 'cucumbers':
-        return 'assets/icons/cucumbers.png';
-      case 'eggs':
-        return 'assets/icons/eggs.png';
-      case 'meat':
-        return 'assets/icons/meat.png';
-      case 'medicine':
-        return 'assets/icons/medicine.png';
-      case 'nuts':
-        return 'assets/icons/nuts.png';
-      case 'snack':
-        return 'assets/icons/snack.png';
-      case 'tomatoes':
-        return 'assets/icons/tomatoes.png';
-      case 'water':
-        return 'assets/icons/water.png';
-      case 'yogurt':
-        return 'assets/icons/yogurt.png';
-      default:
-        return 'assets/icons/vegetables.png';
+    if (name.toLowerCase() == 'ябълки') {
+      return 'assets/icons/apples.png';
+    } else if (name.toLowerCase() == 'мляко') {
+      return 'assets/icons/milk.png';
+    } else if (name.toLowerCase() == 'кашкавал') {
+      return 'assets/icons/cheese.png';
+    } else if (name.toLowerCase() == 'маслини') {
+      return 'assets/icons/olives.png';
+    } else if (name.toLowerCase() == 'хляб') {
+      return 'assets/icons/bread.png';
+    } else if (name.toLowerCase() == 'сирене') {
+      return 'assets/icons/cheese.png';
+    } else if (name.toLowerCase() == 'краставици') {
+      return 'assets/icons/cucumbers.png';
+    } else if (name.toLowerCase() == 'яйца') {
+      return 'assets/icons/eggs.png';
+    } else if (name.toLowerCase() == 'месо') {
+      return 'assets/icons/meat.png';
+    } else if ([
+      'дуфалак',
+      'атаракс',
+      'продуктал',
+      'ко-валсакор',
+      'ноотропил',
+      'русокард',
+      'мента глог и валериян',
+      'стрезам',
+    ].contains(name.toLowerCase())) {
+      return 'assets/icons/medicine.png';
+    } else if ([
+      'ядки',
+      'бадеми',
+      'фъстъци',
+      'кашу',
+    ].contains(name.toLowerCase())) {
+      return 'assets/icons/nuts.png';
+    } else if (['кроки', 'пуканки'].contains(name.toLowerCase())) {
+      return 'assets/icons/snack.png';
+    } else if (name.toLowerCase() == 'домати') {
+      return 'assets/icons/tomatoes.png';
+    } else if (name.toLowerCase() == 'вода') {
+      return 'assets/icons/water.png';
+    } else if (name.toLowerCase() == 'кисело мляко') {
+      return 'assets/icons/yogurt.png';
     }
+
+    return 'assets/icons/vegetables.png';
   }
 
   void _onAddItemPressed() {
@@ -139,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Add Item',
+                  'Добави продукт',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
@@ -147,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Item Name',
+                      'Име на продукт',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -172,7 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Quantity',
+                      'Количество',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -209,7 +237,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.of(context).pop();
                   },
                   icon: Icon(Icons.check),
-                  label: Text('Add to List', style: TextStyle(fontSize: 16)),
+                  label: Text(
+                    'Добави към списък',
+                    style: TextStyle(fontSize: 16),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 60, 196, 182),
                     foregroundColor: const Color.fromARGB(255, 255, 255, 255),
@@ -234,19 +265,16 @@ class _MyHomePageState extends State<MyHomePage> {
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.onPrimary,
         title: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  widget.title,
-                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(width: 8),
-                Image.asset('assets/icons/cart.png', height: 35, width: 35),
-              ],
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                widget.title,
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(width: 8),
+              Image.asset('assets/icons/cart.png', height: 35, width: 35),
+            ],
           ),
         ),
       ),
@@ -280,10 +308,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     SizedBox(width: 4),
                     Text(
-                      'Add Item',
+                      'Добави продукт',
                       style: TextStyle(
                         color: const Color.fromARGB(255, 70, 103, 93),
-                        fontSize: 23,
+                        fontSize: 20,
                       ),
                     ),
                   ],
@@ -295,24 +323,42 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child:
                     groceryList.isEmpty
-                        ? Center(child: Text("No items yet!"))
+                        ? Center(child: Text("Все още няма продукти"))
                         : ListView.builder(
                           itemCount: groceryList.length,
                           itemBuilder: (context, index) {
+                            final isFading = _fadingItems.contains(index);
+                            final isDone = groceryList[index].isDone;
                             final item = groceryList[index];
-                            return Column(
-                              children: [
-                                GroceryItemTile(
-                                  name: item.name,
-                                  quantity: item.qty,
-                                  iconPath: item.iconPath,
-                                  isChecked: item.isDone,
-                                  onChanged:
-                                      (value) =>
-                                          _markAsDone(index, item.name, value),
+
+                            return AnimatedSlide(
+                              offset:
+                                  isFading
+                                      ? const Offset(-1.0, 0)
+                                      : Offset.zero,
+                              duration: Duration(milliseconds: 400),
+                              curve: Curves.easeInOut,
+                              child: AnimatedOpacity(
+                                opacity: isFading ? 0.0 : 1.0,
+                                duration: Duration(milliseconds: 400),
+                                child: Column(
+                                  children: [
+                                    GroceryItemTile(
+                                      name: item.name,
+                                      quantity: item.qty,
+                                      iconPath: item.iconPath,
+                                      isChecked: isDone,
+                                      onChanged:
+                                          (value) => _markAsDone(
+                                            index,
+                                            item.name,
+                                            value,
+                                          ),
+                                    ),
+                                    SizedBox(height: 10),
+                                  ],
                                 ),
-                                SizedBox(height: 10),
-                              ],
+                              ),
                             );
                           },
                         ),
